@@ -659,7 +659,7 @@ namespace TS4SimRipper
             this.skeleton = new Skeleton(axisTransform, joints);
         }
 
-        public void Write(string path, bool flipYZ, float boneDivider, bool linkTextures, bool glassTextures)
+        public void Write(string path, bool flipYZ, float boneDivider, bool linkTextures, bool glassTextures, bool wingTextures)
         {
             COLLADA dae = new COLLADA();
             dae.asset = new asset() { up_axis = (this.y_up ? UpAxisType.Y_UP : UpAxisType.Z_UP), created = DateTime.Now, modified = DateTime.Now, unit = new assetUnit() { meter = 1d, name = "meter" } };
@@ -749,11 +749,31 @@ namespace TS4SimRipper
                     };
                     imageList.Add(glassSpecular);
                 }
+                if (wingTextures)
+                {
+                    image wing = new image()
+                    {
+                        id = basename + "_wings_diffuse_png",
+                        name = basename + "_wings_diffuse_png",
+                        Item = basename + "_wings_diffuse.png"
+                    };
+                    imageList.Add(wing);
+                    image wingSpecular = new image()
+                    {
+                        id = basename + "_wings_specular_png",
+                        name = basename + "_wings_specular_png",
+                        Item = basename + "_wings_specular.png"
+                    };
+                    imageList.Add(wingSpecular);
+                }
                 images.image = imageList.ToArray();
             }
 
             int counter = 1;
-
+            var texSuffixes = new List<string>();
+            texSuffixes.Add("_{0}_png");
+            if (glassTextures) texSuffixes.Add("_glass_{0}_png");
+            if (wingTextures) texSuffixes.Add("_wings_{0}_png");
             foreach (ColladaMesh cmesh in this.meshes)
             {
                 geometry geom = new geometry();
@@ -784,7 +804,7 @@ namespace TS4SimRipper
                                     Item = new fx_surface_common()
                                     {
                                         type = fx_surface_type_enum.Item2D,
-                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + (glassTextures && counter > 1 ?  "_glass_diffuse_png" : "_diffuse_png") } }
+                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffixes[counter-1],"diffuse") } }
                                     }
                                 },
                                 new common_newparam_type()
@@ -800,7 +820,7 @@ namespace TS4SimRipper
                                     Item = new fx_surface_common()
                                     {
                                         type = fx_surface_type_enum.Item2D,
-                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + (glassTextures && counter > 1 ? "_glass_specular_png" : "_specular_png") } }
+                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffixes[counter-1],"specular") } }
                                     }
                                 },
                                 new common_newparam_type()
@@ -1036,7 +1056,7 @@ namespace TS4SimRipper
 
                     skinJoints skinjoints = new skinJoints()
                     {
-                        input = new InputLocal[] { new InputLocal() { source = "#" + geom.id + "-joints", semantic = "JOINT" }, 
+                        input = new InputLocal[] { new InputLocal() { source = "#" + geom.id + "-joints", semantic = "JOINT" },
                                                    new InputLocal() { source = "#" + geom.id + "-bind_poses", semantic = "INV_BIND_MATRIX" } }
                     };
 
@@ -1050,7 +1070,7 @@ namespace TS4SimRipper
                     skinVertex_weights skinWeights = new skinVertex_weights()
                     {
                         count = (ulong)vcountList.Count,
-                        input = new InputLocalOffset[] { new InputLocalOffset() { source = "#" + geom.id + "-joints", semantic = "JOINT", offset = 0 }, 
+                        input = new InputLocalOffset[] { new InputLocalOffset() { source = "#" + geom.id + "-joints", semantic = "JOINT", offset = 0 },
                                                          new InputLocalOffset() { source = "#" + geom.id + "-skin-weights", semantic = "WEIGHT", offset = 1 } },
                         vcount = vbcount,
                         v = vb

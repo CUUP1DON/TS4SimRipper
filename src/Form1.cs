@@ -1311,11 +1311,13 @@ namespace TS4SimRipper
             saveFileDialog1.DefaultExt = "dae";
             saveFileDialog1.OverwritePrompt = true;
             string defaultFilename = path + "\\" + basename;
+            var hasGlass = this.GlassModel.Any(x => x != null);
+            var hasWings = this.WingsModel.Any(x => x != null);
             if (defaultFilename != null && String.CompareOrdinal(defaultFilename, " ") > 0) saveFileDialog1.FileName = defaultFilename;
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
-                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked, SeparateMeshes_comboBox.SelectedIndex == 2);
+                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked ,SeparateMeshes_comboBox.SelectedIndex == 2&& hasGlass, SeparateMeshes_comboBox.SelectedIndex == 2 && hasWings);
                 return saveFileDialog1.FileName;
             }
             else
@@ -1402,6 +1404,10 @@ namespace TS4SimRipper
             if (occult == SimOccult.Werewolf)
             {
                 rigTGI = new TGI((uint)ResourceTypes.Rig, 0u, 0x60FAA42F9B0B4E39);
+            }
+            else if (occult == SimOccult.Fairy)
+            {
+                rigTGI = new TGI((uint)ResourceTypes.Rig, 0u, FNVhash.FNV64("nuRig"));
             }
             else
             {
