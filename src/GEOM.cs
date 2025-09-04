@@ -943,7 +943,7 @@ namespace TS4SimRipper
                         for (int j = 0; j < this.numVerts; j++)
                         {
                             if (this.vBones[j] == null) this.vBones[j] = new Bones();
-                            byte[] tmp = new byte[] { sourceMesh.vBones[j].boneAssignments[0], sourceMesh.vBones[j].boneAssignments[1], 
+                            byte[] tmp = new byte[] { sourceMesh.vBones[j].boneAssignments[0], sourceMesh.vBones[j].boneAssignments[1],
                                 sourceMesh.vBones[j].boneAssignments[2], sourceMesh.vBones[j].boneAssignments[3] };
                             this.vBones[j].boneAssignments = tmp;
                         }
@@ -952,7 +952,7 @@ namespace TS4SimRipper
                         for (int j = 0; j < this.numVerts; j++)
                         {
                             if (this.vBones[j] == null) this.vBones[j] = new Bones();
-                            byte[] tmp = new byte[] { sourceMesh.vBones[j].boneWeights[0], sourceMesh.vBones[j].boneWeights[1], 
+                            byte[] tmp = new byte[] { sourceMesh.vBones[j].boneWeights[0], sourceMesh.vBones[j].boneWeights[1],
                                 sourceMesh.vBones[j].boneWeights[2], sourceMesh.vBones[j].boneWeights[3] };
                             this.vBones[j].boneWeights = tmp;
                         }
@@ -1033,6 +1033,17 @@ namespace TS4SimRipper
             }
 
             this.copyFaceMorphs = sourceMesh.copyFaceMorphs;
+            foreach (var gs in sourceMesh.GeometryStates)
+            {
+                this.GeometryStates.Add(new GeometryState
+                {
+                    MinVertexIndex = gs.MinVertexIndex,
+                    PrimitiveCount = gs.PrimitiveCount,
+                    StartIndex = gs.StartIndex,
+                    State = gs.State,
+                    VertexCount = gs.VertexCount
+                });
+            }
         }
 
         public GEOM(GEOM basemesh, Vector3[] delta_positions, Vector3[] delta_normals)
@@ -1083,6 +1094,17 @@ namespace TS4SimRipper
                 this.vPositions[i] = new position(delta_positions[i].X, delta_positions[i].Y, delta_positions[i].Z);
                 this.originalPositions[i] = new position(basemesh.originalPositions[i]);
                 this.vNormals[i] = new normal(delta_normals[i].X, delta_normals[i].Y, delta_normals[i].Z);
+            }
+            foreach (var gs in basemesh.GeometryStates)
+            {
+                this.GeometryStates.Add(new GeometryState
+                {
+                    MinVertexIndex = gs.MinVertexIndex,
+                    PrimitiveCount = gs.PrimitiveCount,
+                    StartIndex = gs.StartIndex,
+                    State = gs.State,
+                    VertexCount = gs.VertexCount
+                });
             }
         }
 
@@ -1250,7 +1272,13 @@ namespace TS4SimRipper
             }
             if (this.version >= 15)
             {
-                 this.EBN1 = br.ReadUInt32();
+                var c = br.ReadInt32();
+                for (int i = 0; i < c; i++)
+                {
+                    var gs = new GeometryState();
+                    gs.Read(br);
+                    this.GeometryStates.Add(gs);
+                }
             }
             if (br.BaseStream.Length <= br.BaseStream.Position) return;
             this.numtgi = br.ReadInt32();
@@ -1390,6 +1418,14 @@ namespace TS4SimRipper
             for (int i = 0; i < this.bonehashcount; i++)
             {
                 bw.Write(this.bonehasharray[i]);
+            }
+            if (this.version >= 15)
+            {
+                bw.Write(this.GeometryStates.Count);
+                foreach (var geometryState in this.GeometryStates)
+                {
+                    geometryState.Write(bw);
+                }
             }
             bw.Write(this.numtgi);
             for (int i = 0; i < this.numtgi; i++)
@@ -2304,8 +2340,38 @@ namespace TS4SimRipper
                 return false;
             }
         }
+        public class GeometryState 
+        {
+            public uint State { get; set; }
 
-        public uint EBN1 { get; private set; }
+            public int StartIndex { get; set; }
+
+            public int MinVertexIndex { get; set; }
+
+            public int VertexCount { get; set; }
+
+            public int PrimitiveCount { get; set; }
+
+            public void Read(BinaryReader s)
+            {
+                this.State = s.ReadUInt32();
+                this.StartIndex = s.ReadInt32();
+                this.MinVertexIndex = s.ReadInt32();
+                this.VertexCount = s.ReadInt32();
+                this.PrimitiveCount = s.ReadInt32();
+            }
+
+            public void Write(BinaryWriter s)
+            {
+                s.Write(this.State);
+                s.Write(this.StartIndex);
+                s.Write(this.MinVertexIndex);
+                s.Write(this.VertexCount);
+                s.Write(this.PrimitiveCount);
+            }
+
+        }
+        public List<GeometryState> GeometryStates { get; set; } = new();
 
         public void AutoVertexID(GEOM refMesh)
         {
