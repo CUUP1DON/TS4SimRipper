@@ -67,7 +67,7 @@ namespace TS4SimRipper
         private TS4SaveGame.PersistableTattooTracker tattooTracker;
         string errorList = "";
         FileStream log;
-
+        bool SeparateMeshesByShader => SeparateMeshes_comboBox.SelectedIndex == 2;
         public Form1()
         {
             InitializeComponent();
@@ -1123,7 +1123,7 @@ namespace TS4SimRipper
 
             morphPreview1.Stop_Mesh();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, true, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, true, SeparateMeshesByShader);
         }
 
         private class SculptOrder
@@ -1317,7 +1317,7 @@ namespace TS4SimRipper
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
-                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked ,SeparateMeshes_comboBox.SelectedIndex == 2&& hasGlass, SeparateMeshes_comboBox.SelectedIndex == 2 && hasWings);
+                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked ,SeparateMeshesByShader&& hasGlass, SeparateMeshesByShader && hasWings);
                 return saveFileDialog1.FileName;
             }
             else
@@ -1544,7 +1544,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsTexture, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsTexture, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1560,7 +1560,7 @@ namespace TS4SimRipper
             }
             morphPreview1.Stop_Mesh();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel,WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, true, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, true, SeparateMeshesByShader);
         }
 
         private void SkinState_comboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1572,7 +1572,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(true);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1584,7 +1584,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(true);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1596,7 +1596,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(true);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1608,7 +1608,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(true);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1620,7 +1620,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(false);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
@@ -1638,7 +1638,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel(false);
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 

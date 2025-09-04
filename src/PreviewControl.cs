@@ -1751,7 +1751,7 @@ namespace TS4SimRipper
                 //if (currentSpecular != null) currentSpecular.Save(savename + "_specular.png");
                 //Image currentSpecular = new Bitmap(CurrentSpecular());
                 if (currentSpecular != null) SaveImagePng(currentSpecular, testname);
-                if (SeparateMeshes_comboBox.SelectedIndex == 2)
+                if (SeparateMeshesByShader)
                 {
                     testname = savename + "_glass_diffuse.png";
                     if (currentGlassTexture != null) SaveImagePng(currentGlassTexture, testname);
@@ -2493,7 +2493,7 @@ namespace TS4SimRipper
             if (currentSkin == null) return;
             morphPreview1.Stop_Mesh();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
         }
     }
 }
