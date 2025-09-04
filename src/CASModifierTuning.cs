@@ -292,6 +292,7 @@ namespace TS4SimRipper
                                     else if (String.Compare(reader.Value, "MERMAID") == 0) occult |= SimOccult.Mermaid;
                                     else if (String.Compare(reader.Value, "WITCH") == 0) occult |= SimOccult.Spellcaster;
                                     else if (String.Compare(reader.Value, "WEREWOLF") == 0) occult |= SimOccult.Werewolf;
+                                    else if (String.Compare(reader.Value, "FAIRY") == 0) occult |= SimOccult.Fairy;
                                 }
                             }
                         }
@@ -422,6 +423,7 @@ namespace TS4SimRipper
                                     else if (String.Compare(reader.Value, "MERMAID") == 0) occult |= SimOccult.Mermaid;
                                     else if (String.Compare(reader.Value, "WITCH") == 0) occult |= SimOccult.Spellcaster;
                                     else if (String.Compare(reader.Value, "WEREWOLF") == 0) occult |= SimOccult.Werewolf;
+                                    else if (String.Compare(reader.Value, "FAIRY") == 0) occult |= SimOccult.Fairy;
                                 }
                             }
                         }
@@ -606,6 +608,7 @@ namespace TS4SimRipper
                                     else if (String.Compare(reader.Value, "MERMAID") == 0) occult |= SimOccult.Mermaid;
                                     else if (String.Compare(reader.Value, "WITCH") == 0) occult |= SimOccult.Spellcaster;
                                     else if (String.Compare(reader.Value, "WEREWOLF") == 0) occult |= SimOccult.Werewolf;
+                                    else if (String.Compare(reader.Value, "FAIRY") == 0) occult |= SimOccult.Fairy;
                                 }
                             }
                         }

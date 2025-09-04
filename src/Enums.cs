@@ -357,7 +357,8 @@ namespace TS4SimRipper
         Vampire = 4,
         Mermaid = 8,
         Spellcaster = 16,
-        Werewolf = 32
+        Werewolf = 32, 
+        Fairy = 64
     }
 
     public enum ArchetypeFlags : uint       //used in CASPreset
