@@ -38,6 +38,7 @@ namespace TS4SimRipper
         GEOM[] CurrentModel = null;
         GEOM[] BaseModel = null;
         GEOM[] GlassModel = null;
+        GEOM[] WingsModel = null;
         string currentName;
         string[] partNames = Enum.GetNames(typeof(BodyType));
         Species currentSpecies;
@@ -60,6 +61,8 @@ namespace TS4SimRipper
         Image currentEmission;
         Image currentGlassTexture;
         Image currentGlassSpecular;
+        Image currentWingsTexture;
+        Image currentWingsSpecular;
         Image currentSkin;
         Image currentSculptOverlay;
         Image currentOutfitOverlay;
@@ -378,6 +381,7 @@ namespace TS4SimRipper
             {
                 List<ImageStack> imageStack = new List<ImageStack>();
                 List<ImageStack> glassStack = new List<ImageStack>();
+                List<ImageStack> wingStack = new List<ImageStack>();
                 AgeGender adjustedAge = currentAge >= AgeGender.Teen && currentAge <= AgeGender.Elder ? AgeGender.Adult : currentAge;
                 string prefix = GetBodyCompletePrefix(currentSpecies, adjustedAge, currentGender);
                 currentRig = new RIG(baseRig);
@@ -391,6 +395,7 @@ namespace TS4SimRipper
                 BaseModel = new GEOM[partNames.Length];
                 CurrentModel = new GEOM[partNames.Length];
                 GlassModel = new GEOM[partNames.Length];
+                WingsModel = new GEOM[partNames.Length];
                 AgeGender[] partGenders = new AgeGender[partNames.Length];
                 for (int i = 0; i < partGenders.Length; i++) partGenders[i] = AgeGender.None;
                 string[] packNames = currentOutfits[outfitIndex].packages;
@@ -512,6 +517,7 @@ namespace TS4SimRipper
                     TGI bumpTGI = null;
                     TGI emissionTGI = null;
                     bool gotGlass = false;
+                    bool gotWings = false;
                     bool rejected = false;
                     if (tgis.Length > 0)
                     {
@@ -565,6 +571,7 @@ namespace TS4SimRipper
                                 if (bumpTGI == null && geom.Shader.normalIndex >= 0) bumpTGI = geom.TGIList[geom.Shader.normalIndex];
                                 if (emissionTGI == null && geom.Shader.emissionIndex >= 0) emissionTGI = geom.TGIList[geom.Shader.emissionIndex];
                                 if (geom.ShaderHash == (uint)SimShader.SimGlass) gotGlass = true;
+                                if (geom.ShaderHash == (uint)SimShader.SimWings) gotWings = true;
                             }
                         }
                     }
@@ -606,6 +613,7 @@ namespace TS4SimRipper
                             currentOutfitOverlay = texture;
                         }
                         if (gotGlass) glassStack.Add(new ImageStack(outfit[i].SortLayer, outfit[i].CompositionMethod, colorShifts[i], outfit[i].BodyType, outfit[i].HasMesh, texture, shadow, specular, bumpmap, emissionmap));
+                    if (gotWings) wingStack.Add(new ImageStack(outfit[i].SortLayer, outfit[i].CompositionMethod, colorShifts[i], outfit[i].BodyType, outfit[i].HasMesh, texture, shadow, specular, bumpmap, emissionmap));
                    // }
                 }
                 if(tattooTracker?.body_type_tattoo_data?.Any()==true){
@@ -673,6 +681,9 @@ namespace TS4SimRipper
                     {
                         if (GlassModel[ind] == null) GlassModel[ind] = geom;
                         else GlassModel[ind].AppendMesh(geom);
+                    } else if (geom.ShaderHash == (uint)SimShader.SimWings) {
+                        if (WingsModel[ind] == null) WingsModel[ind] = geom;
+                        else WingsModel[ind].AppendMesh(geom);
                     }
                     else
                     {
@@ -1085,6 +1096,59 @@ namespace TS4SimRipper
                     }
                     currentGlassTexture = image;
                     currentGlassSpecular = spec;
+                }
+
+                if (wingStack.Count > 0)
+                {
+                    wingStack.Sort((x, y) => x.sortLayer.CompareTo(y.sortLayer));
+                    image = new Bitmap(currentSize.Width, currentSize.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                    spec = new Bitmap(currentSize.Width / 2, currentSize.Height / 2, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    using (Graphics g = Graphics.FromImage(image))
+                    {
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        Point origin = new Point(0, 0);
+                        for (int i = 0; i < wingStack.Count; i++)
+                        {
+                            if (wingStack[i].image != null && wingStack[i].compositionMethod != 3)
+                            {
+                                if (wingStack[i].compositionMethod == 2)
+                                {
+                                    alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity * imageStack[i].Opacity; ;
+                                }
+                                else if (wingStack[i].compositionMethod == 4)
+                                {
+                                    alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity2 * imageStack[i].Opacity; ;
+                                }
+                                else
+                                {
+                                    alphaMatrix[3][3] = 1f;
+                                }
+                                ColorMatrix convert = new ColorMatrix(alphaMatrix);
+                                ImageAttributes attributes = new ImageAttributes();
+                                attributes.SetColorMatrix(convert, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                                g.DrawImage(wingStack[i].image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, wingStack[i].image.Width, wingStack[i].image.Height, GraphicsUnit.Pixel, attributes);
+                            }
+                            else if (wingStack[i].image != null && wingStack[i].compositionMethod == 3)
+                            {
+                                using (Graphics go = Graphics.FromImage(currentOutfitOverlay))
+                                {
+                                    go.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                    go.DrawImage(wingStack[i].image, new Rectangle(0, 0, currentOutfitOverlay.Width, currentOutfitOverlay.Height), 0, 0, wingStack[i].image.Width, wingStack[i].image.Height, GraphicsUnit.Pixel);
+                                }
+                            }
+                            if (wingStack[i].specular != null & wingStack[i].image != null)
+                                spec = LayerWithMask(spec, DisplayableSpecular(wingStack[i].specular), wingStack[i].image, wingStack[i].isMesh);
+                            else if (wingStack[i].specular != null)
+                            {
+                                using (Graphics gs = Graphics.FromImage(spec))
+                                {
+                                    gs.DrawImage(DisplayableSpecular(wingStack[i].specular), origin);
+                                }
+                            }
+                        }
+                    }
+                    currentWingsTexture = image;
+                    currentWingsSpecular = spec;
                 }
 
                 LogMe(log, "Blending skin/pelt texture");
@@ -1556,6 +1620,11 @@ namespace TS4SimRipper
                         if (tmp == null) tmp = new GEOM(GlassModel[i]);
                         else tmp.AppendMesh(GlassModel[i]);
                     }
+                    if (WingsModel[i] != null)
+                    {
+                        if (tmp == null) tmp = new GEOM(WingsModel[i]);
+                        else tmp.AppendMesh(WingsModel[i]);
+                    }
                 }
                 //if (CurrentModel[(int)BodyType.Hair] != null) tmp.AppendMesh(CurrentModel[(int)BodyType.Hair]);       //hair 
                 //if (GlassModel[(int)BodyType.Hair] != null) tmp.AppendMesh(GlassModel[(int)BodyType.Hair]);
@@ -1568,10 +1637,11 @@ namespace TS4SimRipper
             {
                 for (int i = CurrentModel.Length - 1; i >= 0; i--)
                 {
-                    if (CurrentModel[i] != null || GlassModel[i] != null)
+                    var model = CurrentModel[i] ?? GlassModel[i] ?? WingsModel[i];
+                    if (model != null)
                     {
-                        GEOM tmp = CurrentModel[i] != null ? new GEOM(CurrentModel[i]) : new GEOM(GlassModel[i]);
-                        if (CurrentModel[i] != null && GlassModel[i] != null) tmp.AppendMesh(GlassModel[i]);
+                        GEOM tmp = new GEOM(model);// CurrentModel[i] != null ? new GEOM(CurrentModel[i]) : GlassModel[i]!=null? new GEOM(GlassModel[i]): new GEOM(WingsModel[i]);
+                        tmp.AppendMesh(model);
                         geomList.Add(tmp);
                         nameList.Add(partNames[i]);
                     }
@@ -1595,6 +1665,7 @@ namespace TS4SimRipper
             {
                 GEOM solid = null;
                 GEOM glass = null;
+                GEOM wings = null;
                 for (int i = CurrentModel.Length - 1; i >= 0; i--)
                 {
                     if (CurrentModel[i] != null)
@@ -1607,6 +1678,11 @@ namespace TS4SimRipper
                         if (glass == null) glass = new GEOM(GlassModel[i]);
                         else glass.AppendMesh(GlassModel[i]);
                     }
+                    if (WingsModel[i] != null)
+                    {
+                        if (wings == null) wings = new GEOM(WingsModel[i]);
+                        else wings.AppendMesh(WingsModel[i]);
+                    }
                 }
                 //if (CurrentModel[(int)BodyType.Hair] != null) solid.AppendMesh(CurrentModel[(int)BodyType.Hair]);       //hair 
                 //if (GlassModel[(int)BodyType.Hair] != null) glass.AppendMesh(GlassModel[(int)BodyType.Hair]);
@@ -1614,8 +1690,10 @@ namespace TS4SimRipper
                 //if (GlassModel[(int)BodyType.Hat] != null) glass.AppendMesh(GlassModel[(int)BodyType.Hat]);
                 if (solid != null) geomList.Add(solid);
                 if (glass != null) geomList.Add(glass);
+                if (wings != null) geomList.Add(wings);
                 if (solid != null) nameList.Add(basename);
                 if (glass != null) nameList.Add(basename + "_glass");
+                if (wings != null) nameList.Add(basename + "_wings");
             }
 
             if (format == MeshFormat.OBJ)
@@ -1684,6 +1762,10 @@ namespace TS4SimRipper
                 testname = savename + "_emissionmap.png";
                 //if (currentEmission != null) currentEmission.Save(savename + "_emissionmap.png");
                 if (currentEmission != null) SaveImagePng(currentEmission, testname);
+                testname = savename + "_wings_diffuse.png";
+                if (currentWingsTexture != null) SaveImagePng(currentWingsTexture, testname);
+                testname = savename + "_wings_specular.png";
+                if (currentWingsSpecular != null) SaveImagePng(currentWingsSpecular, testname);
             }
             catch (Exception e)
             {
@@ -1771,6 +1853,41 @@ namespace TS4SimRipper
                 {
                     if (saveFileDialog1.FileName.Length == 0) return;
                     SaveImagePng(currentGlassSpecular, saveFileDialog1.FileName);
+                }
+            }
+        }
+        private void SaveWings_button_Click(object sender, EventArgs e)
+        {
+            if (currentWingsTexture == null)
+            {
+                MessageBox.Show("There is no wing texture for this model!");
+                return;
+            }
+            string path = Properties.Settings.Default.LastSavePath;
+            byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
+            string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = Imagefilter;
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.AddExtension = true;
+            saveFileDialog1.CheckPathExists = true;
+            saveFileDialog1.DefaultExt = "png";
+            saveFileDialog1.OverwritePrompt = true;
+            saveFileDialog1.Title = "Save Wing Texture";
+            saveFileDialog1.FileName = path + "\\" + basename + "_Wing_Diffuse.png";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if (saveFileDialog1.FileName.Length == 0) return;
+                if (currentWingsTexture != null) SaveImagePng(currentWingsTexture, saveFileDialog1.FileName);
+            }
+            if (currentWingsSpecular != null)
+            {
+                saveFileDialog1.Title = "Save Wing Specular";
+                saveFileDialog1.FileName = path + "\\" + basename + "_Wing_Specular.png";
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    if (saveFileDialog1.FileName.Length == 0) return;
+                    SaveImagePng(currentWingsSpecular, saveFileDialog1.FileName);
                 }
             }
         }
@@ -2371,8 +2488,8 @@ namespace TS4SimRipper
         {
             if (currentSkin == null) return;
             morphPreview1.Stop_Mesh();
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
+            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshes_comboBox.SelectedIndex == 2);
         }
     }
 }

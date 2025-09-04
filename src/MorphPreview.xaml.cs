@@ -130,8 +130,8 @@ namespace TS4SimRipper
 
         //public void Start_Mesh(GEOM model, System.Drawing.Image texture, System.Drawing.Image specular,
         //    GEOM glassModel, System.Drawing.Image glassTexture, System.Drawing.Image glassSpecular, bool setView)
-        public void Start_Mesh(GEOM[] model, GEOM[] glass, System.Drawing.Image texture, System.Drawing.Image specular,
-            System.Drawing.Image glassTexture, System.Drawing.Image glassSpecular, bool setView, bool glassIsSeparate)
+        public void Start_Mesh(GEOM[] model, GEOM[] glass, GEOM[] wings, System.Drawing.Image texture, System.Drawing.Image specular,
+            System.Drawing.Image glassTexture, System.Drawing.Image glassSpecular, System.Drawing.Image wingTexture, System.Drawing.Image wingSpecular, bool setView, bool glassIsSeparate)
         {
             Cursor = Cursors.Arrow;
             myMaterial.Children.Clear();
@@ -154,7 +154,7 @@ namespace TS4SimRipper
                     modelDepth = Math.Max(tmp[1], modelDepth);
                 }
             }
-            
+
             if (setView)
             {
                 Camera1.Position = new Point3D(0, 0, modelHeight + (modelDepth * 2));
@@ -198,6 +198,22 @@ namespace TS4SimRipper
                     {
                         MeshGeometry3D myBody = SimMesh(glass[i], modelHeight);
                         GeometryModel3D myBodyMesh = new GeometryModel3D(myBody, myMaterial);
+                        myBodyMesh.Transform = modelTransform;
+                        modelGroup.Children.Add(myBodyMesh);
+                    }
+                }
+            }
+            if (wingTexture != null)
+            {
+                MaterialGroup wingsMaterial = new MaterialGroup();
+                wingsMaterial.Children.Add(new DiffuseMaterial(GetImageBrush(wingTexture)));
+                if (wingSpecular != null) myMaterial.Children.Add(new SpecularMaterial(GetImageBrush(wingSpecular), 25d));
+                for (int i = wings.Length - 1; i >= 0; i--)
+                {
+                    if (wings[i] != null)
+                    {
+                        MeshGeometry3D myBody = SimMesh(wings[i], modelHeight);
+                        GeometryModel3D myBodyMesh = new GeometryModel3D(myBody, wingsMaterial);
                         myBodyMesh.Transform = modelTransform;
                         modelGroup.Children.Add(myBodyMesh);
                     }

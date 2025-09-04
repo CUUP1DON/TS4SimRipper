@@ -474,6 +474,7 @@ namespace TS4SimRipper
     {
         SimSkin = 0x548394B9,
         SimGlass = 0x5EDA9CDE,
+        SimWings = 0x941695AE,
         SimGhost = 0x9516A357,
         Phong = 0xB9105A6D
     }
