@@ -561,7 +561,7 @@ namespace TS4SimRipper
             for (int m = 0; m < geomArray.Length; m++)
             {
                 GEOM geom = new GEOM(geomArray[m]);
-                GEOM.GeometryState geostate = geom.GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = geom.numberVertices, PrimitiveCount = geom.numberFaces };
+                GEOM.GeometryState geostate = geom.GeometryStates.FirstOrDefault() ?? geom.FullMeshGeometryState();
                 geom.FixUnusedBones();
                 ColladaMesh mesh = new ColladaMesh();
                 mesh.meshName = meshNames != null ? meshNames[m].Replace(" ", "") : "CASMesh" + m.ToString();

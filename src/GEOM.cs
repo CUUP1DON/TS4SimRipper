@@ -868,6 +868,9 @@ namespace TS4SimRipper
             }
             return new float[] { yMax, zMax };
         }
+        public GeometryState FullMeshGeometryState() =>
+            new GeometryState() { VertexCount = numberVertices, PrimitiveCount = numberFaces };
+        
 
         public GEOM() { }
 

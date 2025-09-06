@@ -368,7 +368,7 @@ namespace TS4SimRipper
                     else uvSet = 0;
                 }
                 
-                GEOM.GeometryState geostate = geom[m].GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = geom[m].numberVertices, PrimitiveCount = geom[m].numberFaces };
+                GEOM.GeometryState geostate = geom[m].GeometryStates.FirstOrDefault() ?? geom[m].FullMeshGeometryState();
                 for (int i = geostate.MinVertexIndex; i < geostate.VertexCount; i++)
                 {
                     positionList.Add(new Position(geom[m].getPosition(i)));

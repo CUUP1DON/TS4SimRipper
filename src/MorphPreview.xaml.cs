@@ -82,7 +82,7 @@ namespace TS4SimRipper
             int indexOffset = 0;
 
             GEOM g = simgeom;
-            GEOM.GeometryState geostate = g.GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = g.numberVertices, PrimitiveCount = g.numberFaces };
+            GEOM.GeometryState geostate = g.GeometryStates.FirstOrDefault() ?? g.FullMeshGeometryState();
 
             for (int i = geostate.MinVertexIndex; i < geostate.VertexCount; i++)
             {
