@@ -1630,6 +1630,7 @@ namespace TS4SimRipper
                         else tmp.AppendMesh(WingsModel[i]);
                     }
                 }
+                tmp.setShader((uint)SimShader.SimSkin);
                 //if (CurrentModel[(int)BodyType.Hair] != null) tmp.AppendMesh(CurrentModel[(int)BodyType.Hair]);       //hair 
                 //if (GlassModel[(int)BodyType.Hair] != null) tmp.AppendMesh(GlassModel[(int)BodyType.Hair]);
                 //if (CurrentModel[(int)BodyType.Hat] != null) tmp.AppendMesh(CurrentModel[(int)BodyType.Hat]);
