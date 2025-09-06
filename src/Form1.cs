@@ -67,6 +67,8 @@ namespace TS4SimRipper
         private TS4SaveGame.PersistableTattooTracker tattooTracker;
         string errorList = "";
         FileStream log;
+        bool SingleMesh => SeparateMeshes_comboBox.SelectedIndex == 0;
+        bool SeparateMeshesByPart => SeparateMeshes_comboBox.SelectedIndex == 1;
         bool SeparateMeshesByShader => SeparateMeshes_comboBox.SelectedIndex == 2;
         public Form1()
         {

@@ -1609,7 +1609,7 @@ namespace TS4SimRipper
             string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
             List<GEOM> geomList = new List<GEOM>();
             List<string> nameList = new List<string>();
-            if (SeparateMeshes_comboBox.SelectedIndex == 0)     //single mesh
+            if (SingleMesh)     //single mesh
             {
                 GEOM tmp = null;
                 for (int i = CurrentModel.Length - 1; i >= 0; i--)   
@@ -1637,7 +1637,7 @@ namespace TS4SimRipper
                 geomList.Add(tmp);
                 nameList.Add(basename);
             }
-            else if (SeparateMeshes_comboBox.SelectedIndex == 1)                                             //all separate meshes
+            else if (SeparateMeshesByPart)                                             //all separate meshes
             {
                 for (int i = CurrentModel.Length - 1; i >= 0; i--)
                 {
