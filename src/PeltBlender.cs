@@ -157,12 +157,14 @@ namespace TS4SimRipper
             {
                 HSVColor hsvColor = new HSVColor(color[i + 2], color[i + 1], color[i]);
                 HSVColor hsvDetail = new HSVColor(detail[i + 2], detail[i + 1], detail[i]);
+                byte detailAlpha = detail[i + 3];
                 hsvColor.Value *= 0.9f;
                 hsvColor.Value += ((hsvDetail.Value - 0.5f) * 1.1f) * (hsvColor.Value * 0.25f + 1f);
                 byte[] rgb = hsvColor.ToRGBColor();
                 color[i + 2] = rgb[0];
                 color[i + 1] = rgb[1];
                 color[i] = rgb[2];
+                color[i + 3] = detailAlpha;
 
                 //HSLColor hslColor = new HSLColor(color[i + 2], color[i + 1], color[i]);
                 //HSLColor hslDetail = new HSLColor(detail[i + 2], detail[i + 1], detail[i]);
