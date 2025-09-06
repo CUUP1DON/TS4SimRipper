@@ -2356,6 +2356,7 @@ namespace TS4SimRipper
             public uint State { get; set; }
 
             public int StartIndex { get; set; }
+            public int StartFace => StartIndex / 3;
 
             public int MinVertexIndex { get; set; }
 

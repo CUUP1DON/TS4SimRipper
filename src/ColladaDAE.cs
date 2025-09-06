@@ -634,7 +634,7 @@ namespace TS4SimRipper
                 mesh.offsets = new Offsets(positionOffset, normalsOffset, uvOffsets, colorsOffset);
 
                 List<uint> facepoints = new List<uint>();
-                for (int f = geostate.StartIndex; f < geostate.PrimitiveCount; f++)
+                for (int f = geostate.StartFace; f < geostate.PrimitiveCount; f++)
                 {
                     uint[] face = geom.getFaceIndicesUint(f);
                     for (int i = 0; i < 3; i++)

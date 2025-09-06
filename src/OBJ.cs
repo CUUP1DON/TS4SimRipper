@@ -379,7 +379,7 @@ namespace TS4SimRipper
                     if (includeVertexID) idList.Add(geom[m].getVertexID(i));
                 }
                 this.groupList.Add(new Group(groupnames[m]));
-                for (int i = geostate.StartIndex; i < geostate.PrimitiveCount; i++)
+                for (int i = geostate.StartFace; i < geostate.PrimitiveCount; i++)
                 {
                     this.groupList[groupNum].addFace(new Face(geom[m].getFaceIndices(i), vertOffset));
                 }

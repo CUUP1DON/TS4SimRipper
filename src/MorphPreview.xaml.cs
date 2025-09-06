@@ -94,7 +94,7 @@ namespace TS4SimRipper
                 uvs.Add(new Point(uv[0], uv[1]));
             }
 
-            for (int i = geostate.StartIndex; i < geostate.PrimitiveCount; i++)
+            for (int i = geostate.StartFace; i < geostate.PrimitiveCount; i++)
             {
                 int[] face = g.getFaceIndices(i+ geostate.MinVertexIndex);
                 facepoints.Add(face[0] + indexOffset);
