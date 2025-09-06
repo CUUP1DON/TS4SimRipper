@@ -591,6 +591,7 @@ namespace TS4SimRipper
                         inverseBinds.Add((axisTransform * bone.GlobalTransform).Inverse());
                     }
                 }
+                mesh.shader = geom.ShaderHash;
                 mesh.jointNames = boneNames.ToArray();
                 mesh.inverseBindMatrix = inverseBinds.ToArray();
                 bool unassignedBones = false;
@@ -770,16 +771,22 @@ namespace TS4SimRipper
             }
 
             int counter = 1;
-            var texSuffixes = new List<string>();
-            texSuffixes.Add("_{0}_png");
-            if (glassTextures) texSuffixes.Add("_glass_{0}_png");
-            if (wingTextures) texSuffixes.Add("_wings_{0}_png");
+            var texSuffixes = new Dictionary<uint, string>()
+            {
+
+                {(uint)SimShader.SimSkin, "_{0}_png"},
+                {(uint)SimShader.Phong, "_{0}_png"},
+                {(uint)SimShader.SimGlass, "_glass_{0}_png"},
+                {(uint)SimShader.SimWings, "_wings_{0}_png"},
+
+            };
             foreach (ColladaMesh cmesh in this.meshes)
             {
                 geometry geom = new geometry();
                 geom.id = cmesh.meshID + "-mesh";
                 geom.name = cmesh.meshName;
                 mesh daemesh = new mesh();
+                if (!texSuffixes.TryGetValue(cmesh.shader, out var texSuffix)) texSuffix = texSuffixes[(uint)SimShader.SimSkin];
 
                 string matCount = counter.ToString("d3");
                 if (linkTextures)
@@ -804,7 +811,7 @@ namespace TS4SimRipper
                                     Item = new fx_surface_common()
                                     {
                                         type = fx_surface_type_enum.Item2D,
-                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffixes[counter-1],"diffuse") } }
+                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffix,"diffuse") } }
                                     }
                                 },
                                 new common_newparam_type()
@@ -820,7 +827,7 @@ namespace TS4SimRipper
                                     Item = new fx_surface_common()
                                     {
                                         type = fx_surface_type_enum.Item2D,
-                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffixes[counter-1],"specular") } }
+                                        init_from = new fx_surface_init_from_common[] { new fx_surface_init_from_common() { Value = basename + string.Format(texSuffix,"specular") } }
                                     }
                                 },
                                 new common_newparam_type()
@@ -1262,6 +1269,7 @@ namespace TS4SimRipper
             public string[] jointNames;
             public Matrix4D[] inverseBindMatrix;
             public BoneAssignment[] bones;
+            public uint shader;
 
             public int MaxOffset
             {
