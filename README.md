@@ -12,7 +12,7 @@
 This program requires [Microsoft .NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 
 ## Download
-To download SimRipper, go to [Releases](https://github.com/CmarNYC-Tools/TS4SimRipper/releases) and click the .zip on the latest.
+To download SimRipper, go to [Releases](https://github.com/CUUP1DON/TS4SimRipper/releases) and click the .zip on the latest.
 
 ## TS4 Sim Ripper Changelog (1.8.2026)
 - Updated from .NET 6.0 to .NET 10.0
